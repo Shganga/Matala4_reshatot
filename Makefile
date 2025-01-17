@@ -1,77 +1,44 @@
 #######################################
-# 	Makefile for the ping program.    #
-#	Made by: Roy Simanovich.          #
-#	Last modified: 13/02/2024.        #
-#	For: Computer Networks course.    #
-#	Free to use and distribute.       #
+#   Makefile for the ping program.    #
+#   Updated by: Your Name             #
+#   Date: 2025-01-17                  #
 #######################################
 
 # Use the gcc compiler.
 CC = gcc
 
-# Flags for the compiler. Can also use -g for debugging.
+# Compiler flags for warnings, errors, and C standard.
 CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic
 
 # Command to remove files.
 RM = rm -f
 
-# Header files.
+# Source and header files.
+SRC = ping.c
 HEADERS = ping.h
 
-# Executable files.
-EXECS = ping
+# Executable name.
+EXE = ping
 
-# IP address to ping.
-IP = 1.1.1.1
+# Phony targets - not actual files.
+.PHONY: all clean run run_debug
 
-# Phony targets - targets that are not files but commands to be executed by make.
-.PHONY: all default clean runp runsp
+# Default target: Build the executable.
+all: $(EXE)
 
-# Default target - compile everything and create the executables and libraries.
-all: $(EXECS)
+# Build the executable.
+$(EXE): $(SRC) $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ $(SRC)
 
-# Alias for the default target.
-default: all
+# Run the program with an example command.
+# Adjust the arguments as needed.
+run: $(EXE)
+	sudo ./$(EXE) -a 1.1.1.1 -t 4 -c 4
 
+# Run the program with debugging enabled.
+run_debug: $(EXE)
+	sudo gdb --args ./$(EXE) -a 1.1.1.1 -t 4 -c 4
 
-############
-# Programs #
-############
-
-# Compile the ping program.
-$(EXECS): $(EXECS).o
-	$(CC) $(CFLAGS) -o $@ $^
-
-
-################
-# Run programs #
-################
-
-# Run ping program in sudo mode.
-runp: $(EXECS)
-	sudo ./$< $(IP)
-
-################
-# System Trace #
-################
-
-# Run the ping program with system trace (sudo mode).
-runsp: $(EXECS)
-	sudo strace ./$< $(IP)
-
-################
-# Object files #
-################
-
-# Compile all the C files into object files.
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-
-#################
-# Cleanup files #
-#################
-
-# Remove all the object files, shared libraries and executables.
+# Clean up the compiled files.
 clean:
-	$(RM) *.o *.so $(EXECS)
+	$(RM) $(EXE)

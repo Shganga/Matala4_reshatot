@@ -23,7 +23,7 @@ double min_rtt = 1e9; // Minimum RTT
 double max_rtt = 0; // Maximum RTT
 
 // Signal handler for SIGINT (Ctrl+C)
-void handle_interrupt_signal(int sig) {
+void handle_interrupt_signal() {
     printf("--- ping statistics ---\n");
     printf("%d packets transmitted, %d received, %.2f%% packet loss\n", 
            sent_packets, 
@@ -41,20 +41,26 @@ void handle_interrupt_signal(int sig) {
 }
 
 PingFlags parse_flags(int argc, char *argv[]) {
-    PingFlags ping_flags = {NULL, 0, 0, 0};
+    PingFlags ping_flags = {NULL, 0, 0, 0};  // Default values
     int opt;
+
     while ((opt = getopt(argc, argv, "a:t:c:f")) != -1) {
-        if (opt == 'a') {
-            ping_flags.a = optarg;
-        } else if (opt == 't') {
-            ping_flags.t = atoi(optarg);
-        } else if (opt == 'c') {
-            ping_flags.c = atoi(optarg);
-        } else if (opt == 'f') {
-            ping_flags.f = atoi(optarg);
-        } else {
-            fprintf(stderr, "Invalid flag option.\n");
-            exit(EXIT_FAILURE);
+        switch (opt) {
+            case 'a':
+                ping_flags.a = optarg;
+                break;
+            case 't':
+                ping_flags.t = atoi(optarg);  // Convert string to int
+                break;
+            case 'c':
+                ping_flags.c = atoi(optarg);  // Convert string to int
+                break;
+            case 'f':
+                ping_flags.f = 1;  // Set flood mode to 1 when -f is passed
+                break;
+            default:
+                fprintf(stderr, "Invalid flag option.\n");
+                exit(EXIT_FAILURE);
         }
     }
 
@@ -64,12 +70,13 @@ PingFlags parse_flags(int argc, char *argv[]) {
     }
 
     if (ping_flags.t != 4 && ping_flags.t != 6) {
-        fprintf(stderr, "Error: the type is invalid!\n");
+        fprintf(stderr, "Error: the type is invalid! Use 4 for IPv4 and 6 for IPv6.\n");
         exit(EXIT_FAILURE);
     }
 
     return ping_flags;
 }
+
 
 unsigned short int calculate_checksum(void *data, unsigned int bytes) {
     unsigned short int *data_pointer = (unsigned short int *)data;

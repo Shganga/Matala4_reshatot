@@ -79,6 +79,6 @@ typedef struct {
 unsigned short int calculate_checksum(void *data, unsigned int bytes);
 PingFlags parse_flags(int argc, char *argv[]); 
 void ping(PingFlags opt); 
-void handle_interrupt_signal(int sig);
+void handle_interrupt_signal();
 
 #endif 
